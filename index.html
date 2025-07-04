@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="google-site-verification" content="Yu5SrqKysJNrowL7W3-1r6kAGOf6GyertHg2MR-QMvg" />
+  <meta name="google-signin-client_id" content="870787988649-sj4pcmpa5t6ms6a1kgvsmvsc1tuh1ngu.apps.googleusercontent.com">
+  <title>Novaria - AI Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome for new icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <link rel="stylesheet" href="style.css">
+  <!-- HIGHLIGHT.JS STYLES FOR CODE BLOCKS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body class="app-hidden">
+
+  <div class="app-container">
+    <!-- =============== SIDEBAR =============== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Novaria</h3>
+            <button class="new-chat-btn" id="sidebarNewChatBtn">
+                <i class="fas fa-plus"></i> New Chat
+            </button>
+        </div>
+        <div class="chat-history-container">
+            <h4>History Chat</h4>
+            <ul id="chat-history-list">
+                <!-- Chat history items will be dynamically added here by JavaScript -->
+            </ul>
+        </div>
+        <div class="sidebar-footer">
+            <div class="user-info" id="sidebarUserProfile">
+                <img id="profilePicture" src="placeholder-user.png" alt="User Avatar" class="user-avatar">
+                <div class="profile-details">
+                    <span id="profileName" class="profile-name">User Name</span>
+                    <span id="profileEmail" class="profile-email">user@example.com</span>
+                </div>
+            </div>
+            <button class="logout-btn" id="logoutButtonSidebar">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- =============== MAIN CONTENT =============== -->
+    <main class="main-content">
+        <header class="main-header">
+            <button class="sidebar-toggle-btn" id="sidebarToggleBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="novaria-title-dropdown" id="novariaTitleDropdown">
+                <span id="novaria-main-title">Novaria <i class="fas fa-angle-down"></i></span>
+                <div class="dropdown-menu" id="novariaDropdownMenu">
+                    <a href="#" class="dropdown-item" id="exportChatBtn"><i class="fas fa-file-export"></i> Export Chat</a>
+                    <a href="#" class="dropdown-item" id="shareChatBtn"><i class="fas fa-share-alt"></i> Share Chat</a>
+                    <a href="#" class="dropdown-item" id="clearCurrentChatBtn"><i class="fas fa-trash-alt"></i> Clear Current Chat</a>
+                    <a href="#" class="dropdown-item" id="clearAllHistoryBtn"><i class="fas fa-history"></i> Clear All History</a>
+                </div>
+            </div>
+            <div class="header-actions-right">
+                <button class="favorite-toggle-btn" id="currentChatFavoriteBtn">
+                    <i class="far fa-star"></i> <!-- Initial non-favorited state -->
+                </button>
+                <button class="new-chat-btn-header" id="headerNewChatBtn">
+                    <i class="fas fa-plus-circle"></i>
+                </button>
+                <!-- Theme Toggle -->
+                <div id="mainThemeToggleContainer" class="theme-toggle-main">
+                    <label class="switch">
+                        <input type="checkbox" id="themeToggleMain">
+                        <span class="slider">
+                            <svg class="slider-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path class="moon-shape" d="M12 8a2.83 2.83 0 0 0 4 4 4 4 0 1 1-4-4"/>
+                                <g class="sun-rays">
+                                    <path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.67 17.67 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.33 17.67-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+                                </g>
+                            </svg>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </header>
+
+        <section id="chatSection" class="page-section chat-active">
+            <div id="chatHistory" class="chat-display">
+                <!-- Initial greeting or chat messages will appear here -->
+                <div class="initial-greeting">Hi Fariz, I Can Help You?</div>
+                <div id="thinkingIndicator" class="ai-message thinking-indicator hidden">
+                    <div class="spinner"></div>
+                    <span class="thinking-text">Thinking...</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Wrapper for the bottom chat area -->
+        <div class="bottom-chat-area" id="bottomChatArea">
+            <div class="file-chips-area" id="fileChipsArea">
+                <div id="fileChipContainer" class="file-chip-container">
+                    <!-- File chips will be added here -->
+                </div>
+            </div>
+
+            <div class="new-input-wrapper-container">
+                <div class="input-top-row">
+                    <!-- Model Selector Trigger -->
+                    <div class="model-selector-container">
+                        <button id="customModelSelectorTrigger" class="custom-selector-trigger">
+                            <span id="selectedModelName"></span>
+                            <i class="fas fa-angle-down"></i>
+                        </button>
+                    </div>
+
+                    <!-- Fast/Smart Toggle -->
+                    <div class="speed-smart-toggle-container">
+                        <div class="toggle-switch-group">
+                            <button id="fastButton" class="toggle-button active">Fast</button>
+                            <button id="smartButton" class="toggle-button">Smart</button>
+                        </div>
+                    </div>
+
+                    <!-- Plus button (Attachment) -->
+                    <button class="btn-circle btn-plus-top" id="plusButtonTop">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+
+                <div class="input-bottom-row">
+                    <!-- Message Input -->
+                    <textarea id="messageInput" placeholder="Ask me anything..." rows="1"></textarea>
+
+                    <!-- Voice Input Button -->
+                    <button class="btn-circle btn-voice-bottom" id="voiceInputButtonBottom">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <!-- Send Button -->
+                    <button class="btn-circle btn-send-bottom" id="sendButtonBottom">
+                        <i class="fas fa-arrow-up"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="disclaimer-footer">
+            Novaria dapat melakukan kesalahan mohon perhatikan.
+        </footer>
+    </main>
+  </div>
+
+  <!-- Hidden file input -->
+  <input type="file" id="fileInput" class="hidden" multiple accept="image/*,video/*,audio/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain">
+
+  <!-- Custom Model Select Modal -->
+  <div id="modelSelectModal" class="model-select-modal">
+      <div class="model-select-modal-content">
+          <h3>Choose AI Model</h3>
+          <div id="modelOptions" class="model-options-list">
+              <!-- Options will be populated by JS -->
+          </div>
+          <button id="closeModelModal" class="close-modal-btn">&times;</button>
+      </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
